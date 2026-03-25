@@ -486,7 +486,7 @@
             <div class="control-head">
               <div>
                 <h3>条件によるポイントアップ</h3>
-                <div class="panel-sub">チェックした条件だけ加算して表示します。カードごとの条件はあとから配列を編集して増減できます。</div>
+                <div class="panel-sub">SMBCは Olive を除外する前提で家族ポイントのみを計算対象にしています。UFJは公式の加算条件を細分化し、特定サービスは1件ごとに+1.0%、ただし合計+5.0%が上限になるよう実装しています。</div>
               </div>
               <button class="btn" id="resetConditionsBtn">条件をリセット</button>
             </div>
@@ -514,7 +514,7 @@
           <p class="panel-sub">チェック中の条件を反映した還元率を表示します。</p>
           <div id="detailRoot"></div>
           <div class="footer-note">
-            注記：SMBCは通常7%のみを基準表示しています。Olive表記はこの比較から除外しています。JCBの一部店舗は、モバイルオーダー・オンライン入金など対象条件があります。条件設定は実装しやすいように配列化してあり、将来の更新にも対応しやすい構成です。
+            注記：SMBCは通常7%を基準表示し、要望に合わせてOlive関連の上乗せは計算から除外しています。SMBCの条件計算は家族ポイントのみ、UFJは公式のポイントアッププログラム条件をできるだけ細かく反映しています。UFJの特定サービスは1件ごとに+1.0%ですが、合計上限は+5.0%です。JCBは店舗ごとの条件差が中心のため、共通の加算チェックボックスは設けていません。
           </div>
         </aside>
       </section>
@@ -575,18 +575,39 @@
 
       const conditionConfig = {
         smbc: [
-          { id: 'smbc_family', label: '家族ポイント登録', add: 1.0, note: '+1.0%加算として反映' },
-          { id: 'smbc_app', label: 'アプリログイン等の追加条件', add: 1.0, note: '+1.0%加算として反映' },
-          { id: 'smbc_campaign', label: 'その他の上乗せ条件', add: 1.0, note: '+1.0%加算として反映' }
+          { id: 'smbc_family_1', label: '家族ポイント 1人登録', add: 1.0, note: '家族1人登録ごとに+1.0%、最大+5.0%' },
+          { id: 'smbc_family_2', label: '家族ポイント 2人目', add: 1.0, note: '2親等以内の本会員家族が対象' },
+          { id: 'smbc_family_3', label: '家族ポイント 3人目', add: 1.0, note: 'スマホのタッチ決済／モバイルオーダー利用時に加算' },
+          { id: 'smbc_family_4', label: '家族ポイント 4人目', add: 1.0, note: 'カード現物タッチ・iD・差し込み・磁気は対象外' },
+          { id: 'smbc_family_5', label: '家族ポイント 5人目', add: 1.0, note: '6人以上でも上限は+5.0%' }
         ],
         ufj: [
-          { id: 'ufj_app', label: 'アプリ／会員サービス条件', add: 1.0, note: '+1.0%加算として反映' },
-          { id: 'ufj_payment', label: '引落口座・携帯料金などの条件', add: 1.0, note: '+1.0%加算として反映' },
-          { id: 'ufj_campaign', label: 'その他の上乗せ条件', add: 1.0, note: '+1.0%加算として反映' }
+          { id: 'ufj_app', label: 'MUFGカードアプリに月1回以上ログイン', add: 0.5, note: '+0.5%' },
+          { id: 'ufj_spend_50k', label: '月間ショッピング利用合計5万円以上', add: 0.5, note: '+0.5%' },
+          { id: 'ufj_applepay_or_wallet', label: 'Apple Pay(QUICPay)利用 または GP Walletへチャージ', add: 0.5, note: '+0.5%' },
+          { id: 'ufj_revolving', label: '楽Pay登録 または リボ/分割/カードローン1万円以上', add: 2.0, note: '+2.0%' },
+          { id: 'ufj_direct', label: '三菱UFJダイレクトに月1回以上ログイン', add: 1.0, note: '+1.0%' },
+          { id: 'ufj_salary', label: '三菱UFJ銀行口座で給与/年金受け取り', add: 1.0, note: '+1.0%' },
+          { id: 'ufj_homeloan', label: '三菱UFJ銀行で住宅ローン契約', add: 1.0, note: '+1.0%' },
+          { id: 'ufj_invest', label: 'MUFGグループのつみたて投資を月1万円以上', add: 1.0, note: '+1.0%' },
+          { id: 'ufj_coin', label: 'COIN+対応アプリに三菱UFJ銀行口座を登録', add: 0.5, note: '+0.5%' },
+          { id: 'ufj_service_mobile', label: '携帯電話料金を支払い登録', add: 1.0, group: 'ufj_special_services', note: '+1.0%（特定サービス枠）' },
+          { id: 'ufj_service_power', label: '電気料金を支払い登録', add: 1.0, group: 'ufj_special_services', note: '+1.0%（特定サービス枠）' },
+          { id: 'ufj_service_apple', label: 'Appleのサービスを支払い登録', add: 1.0, group: 'ufj_special_services', note: '+1.0%（特定サービス枠）' },
+          { id: 'ufj_service_abema', label: 'ABEMAプレミアムを支払い登録', add: 1.0, group: 'ufj_special_services', note: '+1.0%（特定サービス枠）' },
+          { id: 'ufj_service_cmoa', label: 'コミックシーモアを支払い登録', add: 1.0, group: 'ufj_special_services', note: '+1.0%（特定サービス枠）' },
+          { id: 'ufj_service_hulu', label: 'Huluを支払い登録', add: 1.0, group: 'ufj_special_services', note: '+1.0%（特定サービス枠）' },
+          { id: 'ufj_service_nikkei', label: '日経電子版を支払い登録', add: 1.0, group: 'ufj_special_services', note: '+1.0%（特定サービス枠）' },
+          { id: 'ufj_service_flier', label: 'flierを支払い登録', add: 1.0, group: 'ufj_special_services', note: '+1.0%（特定サービス枠）' },
+          { id: 'ufj_service_uber', label: 'Uber Oneを支払い登録', add: 1.0, group: 'ufj_special_services', note: '+1.0%（特定サービス枠）' },
+          { id: 'ufj_service_carshare', label: '三井のカーシェアーズを支払い登録', add: 1.0, group: 'ufj_special_services', note: '+1.0%（特定サービス枠）' },
+          { id: 'ufj_service_curves', label: 'カーブスを支払い登録', add: 1.0, group: 'ufj_special_services', note: '+1.0%（特定サービス枠）' }
         ],
-        jcb: [
-          { id: 'jcb_campaign', label: 'キャンペーン加算', add: 1.0, note: '+1.0%加算として反映' }
-        ]
+        jcb: []
+      };
+
+      const conditionGroupCaps = {
+        ufj_special_services: 5.0
       };
 
       const cardMeta = {
@@ -614,9 +635,25 @@
       }
 
       function getConditionBonus(cardKey) {
-        return (conditionConfig[cardKey] || [])
-          .filter(item => conditionState[item.id])
-          .reduce((sum, item) => sum + item.add, 0);
+        const items = conditionConfig[cardKey] || [];
+        const grouped = {};
+        let total = 0;
+
+        items.forEach(item => {
+          if (!conditionState[item.id]) return;
+          if (item.group) {
+            grouped[item.group] = (grouped[item.group] || 0) + item.add;
+          } else {
+            total += item.add;
+          }
+        });
+
+        Object.entries(grouped).forEach(([groupKey, value]) => {
+          const cap = conditionGroupCaps[groupKey];
+          total += typeof cap === 'number' ? Math.min(value, cap) : value;
+        });
+
+        return +total.toFixed(1);
       }
 
       function computeRate(store, cardKey) {
@@ -673,7 +710,7 @@
                       <small>${item.note}</small>
                     </span>
                   </label>
-                `).join('') : '<div class="check-empty">条件はありません。</div>'}
+                `).join('') : '<div class="check-empty">共通の加算条件はありません。店舗ごとの条件のみ反映しています。</div>'}
               </div>
             </div>
           `;

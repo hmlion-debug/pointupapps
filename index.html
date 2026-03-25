@@ -1,0 +1,828 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ポイントアップ店舗 比較一覧</title>
+    <style>
+      :root {
+        --bg: #f5f7fb;
+        --card: #ffffff;
+        --text: #1b2430;
+        --muted: #667085;
+        --line: #d7deea;
+        --navy: #14345c;
+        --smbc: #0d7a53;
+        --ufj: #c43636;
+        --jcb: #1d63b8;
+        --gold: #c58b11;
+        --shadow: 0 14px 40px rgba(20, 52, 92, 0.08);
+        --radius: 20px;
+      }
+
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans", "Noto Sans JP", sans-serif;
+        background: linear-gradient(180deg, #eef3fb 0%, #f8fafc 100%);
+        color: var(--text);
+      }
+
+      .wrap {
+        max-width: 1380px;
+        margin: 0 auto;
+        padding: 24px;
+      }
+
+      .hero {
+        background: linear-gradient(135deg, #14345c 0%, #214d85 100%);
+        color: #fff;
+        border-radius: 28px;
+        padding: 32px;
+        box-shadow: var(--shadow);
+      }
+
+      .hero h1 {
+        margin: 0;
+        font-size: clamp(28px, 4vw, 44px);
+        line-height: 1.15;
+        letter-spacing: 0.02em;
+      }
+
+      .hero p {
+        margin: 12px 0 0;
+        color: rgba(255,255,255,0.88);
+        line-height: 1.8;
+        font-size: 15px;
+      }
+
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 14px;
+        margin-top: 24px;
+      }
+
+      .stat {
+        background: rgba(255,255,255,0.1);
+        border: 1px solid rgba(255,255,255,0.18);
+        border-radius: 18px;
+        padding: 18px;
+        backdrop-filter: blur(6px);
+      }
+
+      .stat strong {
+        display: block;
+        font-size: 28px;
+        margin-bottom: 4px;
+      }
+
+      .layout {
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr;
+        gap: 24px;
+        margin-top: 24px;
+        align-items: start;
+      }
+
+      .panel {
+        background: var(--card);
+        border: 1px solid rgba(20,52,92,0.08);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+      }
+
+      .panel-head {
+        padding: 22px 22px 0;
+      }
+
+      .panel h2 {
+        margin: 0;
+        font-size: 22px;
+      }
+
+      .panel-sub {
+        margin: 8px 0 0;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.7;
+      }
+
+      .toolbar {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 12px;
+        padding: 18px 22px 22px;
+      }
+
+      .search {
+        position: relative;
+      }
+
+      .search input {
+        width: 100%;
+        border: 1px solid var(--line);
+        background: #fff;
+        border-radius: 14px;
+        padding: 14px 16px 14px 44px;
+        font-size: 16px;
+        outline: none;
+      }
+
+      .search input:focus {
+        border-color: #7aa7e0;
+        box-shadow: 0 0 0 4px rgba(56, 132, 255, 0.12);
+      }
+
+      .search::before {
+        content: "🔍";
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 18px;
+      }
+
+      .btn {
+        border: 1px solid var(--line);
+        background: #fff;
+        color: var(--text);
+        border-radius: 14px;
+        padding: 0 16px;
+        font-size: 14px;
+        cursor: pointer;
+        min-height: 48px;
+      }
+
+      .control-panel {
+        margin: 0 22px 22px;
+        border: 1px solid #e6edf7;
+        border-radius: 18px;
+        background: linear-gradient(180deg, #fbfdff 0%, #f7faff 100%);
+        overflow: hidden;
+      }
+
+      .control-head {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        align-items: center;
+        padding: 16px 18px;
+        border-bottom: 1px solid #e8eef7;
+      }
+
+      .control-head h3 {
+        margin: 0;
+        font-size: 16px;
+      }
+
+      .control-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0,1fr));
+        gap: 0;
+      }
+
+      .control-col {
+        padding: 16px 18px 18px;
+        border-right: 1px solid #edf2f8;
+      }
+
+      .control-col:last-child { border-right: 0; }
+
+      .card-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin: 0 0 10px;
+        font-size: 15px;
+      }
+
+      .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        display: inline-block;
+      }
+
+      .dot.smbc { background: var(--smbc); }
+      .dot.ufj { background: var(--ufj); }
+      .dot.jcb { background: var(--jcb); }
+
+      .check-list {
+        display: grid;
+        gap: 10px;
+      }
+
+      .check-item {
+        display: grid;
+        grid-template-columns: 18px 1fr;
+        align-items: start;
+        gap: 10px;
+        padding: 10px 12px;
+        border: 1px solid #e8eef7;
+        border-radius: 14px;
+        background: #fff;
+      }
+
+      .check-item input {
+        margin-top: 3px;
+      }
+
+      .check-item strong {
+        display: block;
+        font-size: 14px;
+        margin-bottom: 2px;
+      }
+
+      .check-item small {
+        display: block;
+        color: var(--muted);
+        line-height: 1.55;
+        font-size: 12px;
+      }
+
+      .check-empty {
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.7;
+        padding: 10px 0;
+      }
+
+      .table-wrap {
+        overflow: auto;
+        border-top: 1px solid #eef2f7;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 860px;
+      }
+
+      th, td {
+        padding: 14px 16px;
+        border-bottom: 1px solid #edf1f6;
+        vertical-align: middle;
+      }
+
+      th {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        background: #f8fbff;
+        font-size: 14px;
+        text-align: left;
+        color: #405267;
+      }
+
+      tbody tr {
+        cursor: pointer;
+        transition: background-color 0.18s ease;
+      }
+
+      tbody tr:hover {
+        background: #f7fbff;
+      }
+
+      tbody tr.is-active {
+        background: #eef6ff;
+      }
+
+      .store-cell {
+        min-width: 270px;
+      }
+
+      .rate {
+        font-weight: 800;
+        letter-spacing: 0.01em;
+        font-size: 17px;
+      }
+
+      .base {
+        display: block;
+        font-size: 12px;
+        color: var(--muted);
+        margin-top: 2px;
+      }
+
+      .rate.smbc { color: var(--smbc); }
+      .rate.ufj { color: var(--ufj); }
+      .rate.jcb { color: var(--jcb); }
+      .dash { color: #a3acb9; }
+
+      .winner {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 800;
+        background: #fff6dd;
+        color: #8a5a00;
+        border: 1px solid #f3df9b;
+      }
+
+      .winner-cell {
+        min-width: 120px;
+      }
+
+      .badge-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 18px;
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        border-radius: 999px;
+        padding: 10px 14px;
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      .badge.smbc { background: rgba(13,122,83,.1); color: var(--smbc); }
+      .badge.ufj { background: rgba(196,54,54,.1); color: var(--ufj); }
+      .badge.jcb { background: rgba(29,99,184,.1); color: var(--jcb); }
+      .badge.best { background: #fff5d8; color: #8a5a00; border: 1px solid #efd88d; }
+
+      .detail {
+        padding: 22px;
+      }
+
+      .detail-card {
+        border: 1px solid #e7edf5;
+        border-radius: 18px;
+        padding: 22px;
+        background: linear-gradient(180deg, #fff 0%, #fbfdff 100%);
+      }
+
+      .detail-label {
+        display: inline-block;
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: #eef4ff;
+        color: #31598f;
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .detail h3 {
+        margin: 14px 0 8px;
+        font-size: clamp(24px, 3vw, 34px);
+        line-height: 1.25;
+      }
+
+      .detail-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0,1fr));
+        gap: 12px;
+        margin-top: 18px;
+      }
+
+      .detail-item {
+        border: 1px solid #e9eef5;
+        border-radius: 16px;
+        padding: 16px;
+        background: #fff;
+      }
+
+      .detail-item small {
+        display: block;
+        color: var(--muted);
+        margin-bottom: 8px;
+      }
+
+      .detail-item strong {
+        font-size: 28px;
+        line-height: 1.15;
+      }
+
+      .detail-item .subrate {
+        margin-top: 6px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .detail-notes {
+        margin-top: 18px;
+        display: grid;
+        gap: 10px;
+      }
+
+      .note-box {
+        padding: 14px 16px;
+        border-radius: 14px;
+        background: #f7f9fc;
+        border: 1px solid #e8eef6;
+        color: #445469;
+        line-height: 1.75;
+        font-size: 14px;
+      }
+
+      .empty {
+        color: var(--muted);
+        text-align: center;
+        padding: 36px 20px;
+      }
+
+      .footer-note {
+        margin-top: 18px;
+        font-size: 13px;
+        color: var(--muted);
+        line-height: 1.8;
+      }
+
+      @media (max-width: 1080px) {
+        .layout { grid-template-columns: 1fr; }
+        .detail-grid { grid-template-columns: 1fr; }
+        .control-grid { grid-template-columns: 1fr; }
+        .control-col { border-right: 0; border-bottom: 1px solid #edf2f8; }
+        .control-col:last-child { border-bottom: 0; }
+      }
+
+      @media (max-width: 760px) {
+        .stats { grid-template-columns: 1fr 1fr; }
+        .toolbar { grid-template-columns: 1fr; }
+      }
+
+      @media (max-width: 640px) {
+        .wrap { padding: 14px; }
+        .hero { padding: 22px; border-radius: 22px; }
+        .stats { grid-template-columns: 1fr; }
+        .panel-head, .detail { padding-left: 16px; padding-right: 16px; }
+        th, td { padding: 12px; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <section class="hero">
+        <h1>ポイントアップ店舗 比較一覧</h1>
+        <p>
+          一覧比較表に加えて、カードごとの条件をチェックすると加算分を自動反映。
+          店舗ごとにどのカードが最も高還元かを、表と詳細カードの両方で分かりやすく可視化します。
+        </p>
+        <div class="stats" id="stats"></div>
+      </section>
+
+      <section class="layout">
+        <div class="panel">
+          <div class="panel-head">
+            <h2>一覧比較表</h2>
+            <p class="panel-sub">条件チェックで還元率を再計算します。行をクリックすると、選択した店舗・サービスの詳細を右側に表示します。</p>
+          </div>
+          <div class="toolbar">
+            <div class="search">
+              <input id="searchInput" type="text" placeholder="店舗名で検索（例：ローソン、スターバックス、松屋）" />
+            </div>
+            <button class="btn" id="clearBtn">検索クリア</button>
+          </div>
+
+          <div class="control-panel">
+            <div class="control-head">
+              <div>
+                <h3>条件によるポイントアップ</h3>
+                <div class="panel-sub">チェックした条件だけ加算して表示します。カードごとの条件はあとから配列を編集して増減できます。</div>
+              </div>
+              <button class="btn" id="resetConditionsBtn">条件をリセット</button>
+            </div>
+            <div class="control-grid" id="conditionGrid"></div>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>店舗・サービス</th>
+                  <th>SMBC</th>
+                  <th>UFJ</th>
+                  <th>JCBカードW</th>
+                  <th>いちばん高いカード</th>
+                </tr>
+              </thead>
+              <tbody id="tableBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <aside class="panel detail">
+          <h2>検索・選択した店舗の詳細</h2>
+          <p class="panel-sub">チェック中の条件を反映した還元率を表示します。</p>
+          <div id="detailRoot"></div>
+          <div class="footer-note">
+            注記：SMBCは通常7%のみを基準表示しています。Olive表記はこの比較から除外しています。JCBの一部店舗は、モバイルオーダー・オンライン入金など対象条件があります。条件設定は実装しやすいように配列化してあり、将来の更新にも対応しやすい構成です。
+          </div>
+        </aside>
+      </section>
+    </div>
+
+    <script>
+      const stores = [
+        { name: 'セイコーマート', smbc: 7, ufj: null, jcb: null, notes: ['SMBCの対象店舗。', 'JCBカードWとUFJはこの比較条件では5%以上の対象外です。'] },
+        { name: 'セブン-イレブン', smbc: 7, ufj: 7, jcb: null, notes: ['SMBC・UFJともに5%以上の対象です。', 'JCBカードWはこの比較条件では5%以上の対象外です。'] },
+        { name: 'ポプラ／生活彩家', smbc: 7, ufj: null, jcb: null, notes: ['SMBCの対象店舗です。'] },
+        { name: 'ミニストップ', smbc: 7, ufj: null, jcb: null, notes: ['SMBCの対象店舗です。'] },
+        { name: 'ローソン／ナチュラルローソン／ローソンストア100／ローソンスリーエフ', smbc: 7, ufj: 7, jcb: null, notes: ['SMBC・UFJの両方で5%以上の対象です。'] },
+        { name: 'マクドナルド', smbc: 7, ufj: null, jcb: 10.5, notes: ['JCBカードWはモバイルオーダー／マックデリバリー限定で10.5%です。', 'SMBCは通常7%です。'] },
+        { name: 'モスバーガー', smbc: 7, ufj: null, jcb: null, notes: ['SMBCの対象店舗です。'] },
+        { name: 'ケンタッキーフライドチキン', smbc: 7, ufj: null, jcb: null, notes: ['SMBCの対象店舗です。'] },
+        { name: '吉野家', smbc: 7, ufj: null, jcb: 10.5, notes: ['JCBカードWは10.5%の対象です。', 'SMBCは通常7%です。'] },
+        { name: 'サイゼリヤ', smbc: 7, ufj: null, jcb: null, notes: ['SMBCの対象店舗です。'] },
+        { name: 'ガスト', smbc: 7, ufj: null, jcb: 10.5, notes: ['SMBCとJCBカードWの両方が強い店舗です。'] },
+        { name: 'バーミヤン', smbc: 7, ufj: null, jcb: 10.5, notes: ['SMBCとJCBカードWの両方が強い店舗です。'] },
+        { name: 'しゃぶ葉', smbc: 7, ufj: null, jcb: null, notes: ['SMBCの対象店舗です。'] },
+        { name: 'ジョナサン', smbc: 7, ufj: null, jcb: 10.5, notes: ['SMBCとJCBカードWの両方が強い店舗です。'] },
+        { name: '夢庵', smbc: 7, ufj: null, jcb: null, notes: ['SMBCの対象店舗です。'] },
+        { name: 'その他すかいらーくグループ飲食店', smbc: 7, ufj: null, jcb: null, notes: ['SMBCで7%の対象です。', '個別ブランドの条件は公式案内も確認してください。'] },
+        { name: 'すき家', smbc: 7, ufj: null, jcb: null, notes: ['SMBCの対象店舗です。'] },
+        { name: 'はま寿司', smbc: 7, ufj: null, jcb: null, notes: ['SMBCの対象店舗です。'] },
+        { name: 'ココス', smbc: 7, ufj: null, jcb: null, notes: ['SMBCの対象店舗です。'] },
+        { name: 'ドトールコーヒーショップ', smbc: 7, ufj: null, jcb: null, notes: ['SMBCの対象店舗です。'] },
+        { name: 'エクセルシオール カフェ', smbc: 7, ufj: null, jcb: null, notes: ['SMBCの対象店舗です。'] },
+        { name: 'かっぱ寿司', smbc: 7, ufj: null, jcb: null, notes: ['SMBCの対象店舗です。'] },
+        { name: 'コカ・コーラ自販機', smbc: null, ufj: 7, jcb: null, notes: ['UFJの対象サービスです。'] },
+        { name: 'くら寿司', smbc: null, ufj: 7, jcb: null, notes: ['UFJの対象店舗です。'] },
+        { name: 'スシロー', smbc: null, ufj: 7, jcb: null, notes: ['UFJの対象店舗です。'] },
+        { name: 'ピザハットオンライン', smbc: null, ufj: 7, jcb: null, notes: ['UFJの対象サービスです。'] },
+        { name: '松屋', smbc: null, ufj: 7, jcb: null, notes: ['UFJの対象店舗です。'] },
+        { name: '松のや', smbc: null, ufj: 7, jcb: null, notes: ['UFJの対象店舗です。'] },
+        { name: 'マイカリー食堂', smbc: null, ufj: 7, jcb: null, notes: ['UFJの対象店舗です。'] },
+        { name: '松弁ネット', smbc: null, ufj: 7, jcb: null, notes: ['UFJの対象サービスです。'] },
+        { name: '松屋モバイルオーダー', smbc: null, ufj: 7, jcb: null, notes: ['UFJの対象サービスです。'] },
+        { name: '松弁デリバリー', smbc: null, ufj: 7, jcb: null, notes: ['UFJの対象サービスです。'] },
+        { name: 'ロッテリア', smbc: null, ufj: 7, jcb: null, notes: ['UFJの対象店舗です。'] },
+        { name: 'ゼッテリア', smbc: null, ufj: 7, jcb: null, notes: ['UFJの対象店舗です。'] },
+        { name: 'アオキスーパー', smbc: null, ufj: 7, jcb: null, notes: ['UFJの対象店舗です。'] },
+        { name: 'オーケー', smbc: null, ufj: 7, jcb: null, notes: ['UFJの対象店舗です。'] },
+        { name: 'オオゼキ', smbc: null, ufj: 7, jcb: null, notes: ['UFJの対象店舗です。'] },
+        { name: 'サンリブ／マルショク／リブホール／サンク／サンリブBUONO', smbc: null, ufj: 7, jcb: null, notes: ['UFJの対象店舗です。'] },
+        { name: '三和／フードワン', smbc: null, ufj: 7, jcb: null, notes: ['UFJの対象店舗です。'] },
+        { name: 'スーパー魚長／生鮮乃木市場／生鮮げんき市場', smbc: null, ufj: 7, jcb: null, notes: ['UFJの対象店舗です。'] },
+        { name: '近商ストア／ハーベス／Pochette', smbc: null, ufj: 7, jcb: null, notes: ['UFJの対象店舗です。'] },
+        { name: '東急ストア／プレッセ／フードステーション', smbc: null, ufj: 7, jcb: null, notes: ['UFJの対象店舗です。'] },
+        { name: '東武ストア', smbc: null, ufj: 7, jcb: null, notes: ['UFJの対象店舗です。'] },
+        { name: 'ドミー', smbc: null, ufj: 7, jcb: null, notes: ['UFJの対象店舗です。'] },
+        { name: '肉のハナマサ', smbc: null, ufj: 7, jcb: null, notes: ['UFJの対象店舗です。'] },
+        { name: 'ジャパンミート／MEATMeet／パワーマート', smbc: null, ufj: 7, jcb: null, notes: ['UFJの対象店舗です。'] },
+        { name: 'ヤマナカ／フランテ／フランテロゼ', smbc: null, ufj: 7, jcb: null, notes: ['UFJの対象店舗です。'] },
+        { name: 'スターバックス', smbc: null, ufj: null, jcb: 10.5, notes: ['JCBカードWは、オンライン入金・オートチャージ・eGift・モバイルオーダーが対象です。', '店頭利用はこの比較条件では対象外です。'] },
+        { name: 'サンマルクカフェ', smbc: null, ufj: null, jcb: 10.5, notes: ['JCBカードWで10.5%です。', '2026/1/13〜2027/1/12の期間限定です。'] }
+      ];
+
+      const conditionConfig = {
+        smbc: [
+          { id: 'smbc_family', label: '家族ポイント登録', add: 1.0, note: '+1.0%加算として反映' },
+          { id: 'smbc_app', label: 'アプリログイン等の追加条件', add: 1.0, note: '+1.0%加算として反映' },
+          { id: 'smbc_campaign', label: 'その他の上乗せ条件', add: 1.0, note: '+1.0%加算として反映' }
+        ],
+        ufj: [
+          { id: 'ufj_app', label: 'アプリ／会員サービス条件', add: 1.0, note: '+1.0%加算として反映' },
+          { id: 'ufj_payment', label: '引落口座・携帯料金などの条件', add: 1.0, note: '+1.0%加算として反映' },
+          { id: 'ufj_campaign', label: 'その他の上乗せ条件', add: 1.0, note: '+1.0%加算として反映' }
+        ],
+        jcb: [
+          { id: 'jcb_campaign', label: 'キャンペーン加算', add: 1.0, note: '+1.0%加算として反映' }
+        ]
+      };
+
+      const cardMeta = {
+        smbc: { label: 'SMBC', className: 'smbc' },
+        ufj: { label: 'UFJ', className: 'ufj' },
+        jcb: { label: 'JCBカードW', className: 'jcb' }
+      };
+
+      const tableBody = document.getElementById('tableBody');
+      const detailRoot = document.getElementById('detailRoot');
+      const searchInput = document.getElementById('searchInput');
+      const clearBtn = document.getElementById('clearBtn');
+      const statsRoot = document.getElementById('stats');
+      const conditionGrid = document.getElementById('conditionGrid');
+      const resetConditionsBtn = document.getElementById('resetConditionsBtn');
+
+      let filtered = [...stores];
+      let activeName = stores[0].name;
+      const conditionState = {};
+
+      function initializeConditionState() {
+        Object.values(conditionConfig).flat().forEach(item => {
+          conditionState[item.id] = false;
+        });
+      }
+
+      function getConditionBonus(cardKey) {
+        return (conditionConfig[cardKey] || [])
+          .filter(item => conditionState[item.id])
+          .reduce((sum, item) => sum + item.add, 0);
+      }
+
+      function computeRate(store, cardKey) {
+        const base = store[cardKey];
+        if (base == null) {
+          return { base: null, total: null, bonus: 0 };
+        }
+        const bonus = getConditionBonus(cardKey);
+        return { base, total: +(base + bonus).toFixed(1), bonus };
+      }
+
+      function getWinner(store) {
+        const values = [
+          { key: 'smbc', ...computeRate(store, 'smbc') },
+          { key: 'ufj', ...computeRate(store, 'ufj') },
+          { key: 'jcb', ...computeRate(store, 'jcb') }
+        ].filter(item => item.total != null);
+
+        if (!values.length) return [];
+        const max = Math.max(...values.map(item => item.total));
+        return values.filter(item => item.total === max);
+      }
+
+      function formatPercent(value) {
+        if (value == null) return '—';
+        return `${Number.isInteger(value) ? value : value.toFixed(1)}%`;
+      }
+
+      function renderStats() {
+        const smbcBonus = getConditionBonus('smbc');
+        const ufjBonus = getConditionBonus('ufj');
+        const jcbBonus = getConditionBonus('jcb');
+        statsRoot.innerHTML = `
+          <div class="stat"><strong>${stores.length}</strong><span>掲載店舗・サービス数</span></div>
+          <div class="stat"><strong>+${formatPercent(smbcBonus).replace('%','')}%</strong><span>SMBC 条件加算</span></div>
+          <div class="stat"><strong>+${formatPercent(ufjBonus).replace('%','')}%</strong><span>UFJ 条件加算</span></div>
+          <div class="stat"><strong>+${formatPercent(jcbBonus).replace('%','')}%</strong><span>JCB 条件加算</span></div>
+        `;
+      }
+
+      function renderConditions() {
+        conditionGrid.innerHTML = ['smbc', 'ufj', 'jcb'].map(cardKey => {
+          const meta = cardMeta[cardKey];
+          const items = conditionConfig[cardKey];
+          return `
+            <div class="control-col">
+              <h4 class="card-title"><span class="dot ${meta.className}"></span>${meta.label}</h4>
+              <div class="check-list">
+                ${items.length ? items.map(item => `
+                  <label class="check-item">
+                    <input type="checkbox" data-condition-id="${item.id}" ${conditionState[item.id] ? 'checked' : ''}>
+                    <span>
+                      <strong>${item.label}</strong>
+                      <small>${item.note}</small>
+                    </span>
+                  </label>
+                `).join('') : '<div class="check-empty">条件はありません。</div>'}
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        conditionGrid.querySelectorAll('input[type="checkbox"]').forEach(input => {
+          input.addEventListener('change', event => {
+            conditionState[event.target.dataset.conditionId] = event.target.checked;
+            rerenderAll();
+          });
+        });
+      }
+
+      function rateCell(result, cls) {
+        if (result.total == null) {
+          return '<span class="dash">—</span>';
+        }
+        const baseText = result.bonus > 0 ? `<span class="base">基準 ${formatPercent(result.base)} ＋ 条件 ${formatPercent(result.bonus)}</span>` : `<span class="base">基準 ${formatPercent(result.base)}</span>`;
+        return `<span class="rate ${cls}">${formatPercent(result.total)}</span>${baseText}`;
+      }
+
+      function renderWinner(store) {
+        const winners = getWinner(store);
+        if (!winners.length) return '<span class="dash">—</span>';
+        if (winners.length === 1) {
+          const meta = cardMeta[winners[0].key];
+          return `<span class="winner">🏆 ${meta.label} ${formatPercent(winners[0].total)}</span>`;
+        }
+        return `<span class="winner">🏆 同率 ${winners.map(w => `${cardMeta[w.key].label} ${formatPercent(w.total)}`).join(' / ')}</span>`;
+      }
+
+      function renderTable() {
+        if (!filtered.length) {
+          tableBody.innerHTML = `<tr><td colspan="5" class="empty">該当する店舗が見つかりませんでした。</td></tr>`;
+          return;
+        }
+
+        tableBody.innerHTML = filtered.map(item => {
+          const smbc = computeRate(item, 'smbc');
+          const ufj = computeRate(item, 'ufj');
+          const jcb = computeRate(item, 'jcb');
+          return `
+            <tr data-name="${item.name}" class="${item.name === activeName ? 'is-active' : ''}">
+              <td class="store-cell">${item.name}</td>
+              <td>${rateCell(smbc, 'smbc')}</td>
+              <td>${rateCell(ufj, 'ufj')}</td>
+              <td>${rateCell(jcb, 'jcb')}</td>
+              <td class="winner-cell">${renderWinner(item)}</td>
+            </tr>
+          `;
+        }).join('');
+
+        tableBody.querySelectorAll('tr[data-name]').forEach(row => {
+          row.addEventListener('click', () => {
+            activeName = row.dataset.name;
+            renderTable();
+            renderDetail();
+          });
+        });
+      }
+
+      function renderDetail() {
+        const item = stores.find(s => s.name === activeName) || stores[0];
+        const smbc = computeRate(item, 'smbc');
+        const ufj = computeRate(item, 'ufj');
+        const jcb = computeRate(item, 'jcb');
+        const winners = getWinner(item);
+        const winnerText = !winners.length
+          ? '対象カードなし'
+          : winners.length === 1
+            ? `${cardMeta[winners[0].key].label} が最も高還元です。`
+            : `同率トップ：${winners.map(w => `${cardMeta[w.key].label} ${formatPercent(w.total)}`).join(' / ')}`;
+
+        const badges = [
+          smbc.total != null ? `<span class="badge smbc">SMBC ${formatPercent(smbc.total)}</span>` : '',
+          ufj.total != null ? `<span class="badge ufj">UFJ ${formatPercent(ufj.total)}</span>` : '',
+          jcb.total != null ? `<span class="badge jcb">JCBカードW ${formatPercent(jcb.total)}</span>` : '',
+          winners.length ? `<span class="badge best">🏆 ${winnerText}</span>` : ''
+        ].join('');
+
+        detailRoot.innerHTML = `
+          <div class="detail-card">
+            <span class="detail-label">店舗・サービス詳細</span>
+            <h3>${item.name}</h3>
+            <div class="badge-row">${badges || '<span class="dash">対象カードはありません。</span>'}</div>
+            <div class="detail-grid">
+              <div class="detail-item">
+                <small>SMBC</small>
+                <strong style="color: var(--smbc)">${formatPercent(smbc.total)}</strong>
+                <div class="subrate">基準 ${formatPercent(smbc.base)} ／ 条件加算 ${formatPercent(smbc.bonus)}</div>
+              </div>
+              <div class="detail-item">
+                <small>UFJ</small>
+                <strong style="color: var(--ufj)">${formatPercent(ufj.total)}</strong>
+                <div class="subrate">基準 ${formatPercent(ufj.base)} ／ 条件加算 ${formatPercent(ufj.bonus)}</div>
+              </div>
+              <div class="detail-item">
+                <small>JCBカードW</small>
+                <strong style="color: var(--jcb)">${formatPercent(jcb.total)}</strong>
+                <div class="subrate">基準 ${formatPercent(jcb.base)} ／ 条件加算 ${formatPercent(jcb.bonus)}</div>
+              </div>
+            </div>
+            <div class="detail-notes">
+              <div class="note-box"><strong>現在の判定：</strong> ${winnerText}</div>
+              ${item.notes.map(note => `<div class="note-box">${note}</div>`).join('')}
+            </div>
+          </div>
+        `;
+      }
+
+      function applySearch() {
+        const keyword = searchInput.value.trim().toLowerCase();
+        filtered = stores.filter(item => item.name.toLowerCase().includes(keyword));
+        if (filtered.length && !filtered.some(item => item.name === activeName)) {
+          activeName = filtered[0].name;
+        }
+        renderTable();
+        renderDetail();
+      }
+
+      function resetConditions() {
+        Object.keys(conditionState).forEach(key => {
+          conditionState[key] = false;
+        });
+        renderConditions();
+        rerenderAll();
+      }
+
+      function rerenderAll() {
+        renderStats();
+        renderTable();
+        renderDetail();
+      }
+
+      initializeConditionState();
+      renderConditions();
+      renderStats();
+      renderTable();
+      renderDetail();
+
+      searchInput.addEventListener('input', applySearch);
+      clearBtn.addEventListener('click', () => {
+        searchInput.value = '';
+        filtered = [...stores];
+        activeName = stores[0].name;
+        renderTable();
+        renderDetail();
+      });
+      resetConditionsBtn.addEventListener('click', resetConditions);
+    </script>
+  </body>
+</html>
